@@ -1,1 +1,164 @@
+<!DOCTYPE html>
+
 trust nothing
+
+<button onclick="simulateKeyPress(window.prompt('enter key name'))">virtual keyboard</button>
+
+<div id="m"></div>
+
+<script>
+
+/*
+
+RULES
+1. only write bad code
+2. try to write working code
+3. there are no more rules
+
+*/
+
+const intervals = [];
+
+let m = document.getElementById("m");
+
+// this could be better if fetch didn't suck
+let quotes;
+fetch("quotes.json").then((res) => {res.json().then((json) => quotes = json)});
+
+function deleteAllIntervals() {
+    intervals.forEach((inter) => {clearInterval(inter)});
+}
+
+function l(input) {
+    return input(input);
+}
+
+// thanks chatgpt
+function simulateKeyPress(key) {
+    // Create a new keyboard event
+    const event = new KeyboardEvent('keydown', {
+        key: key, // The key value
+        code: `Key${key.toUpperCase()}`, // The code value (for letters)
+        charCode: key.charCodeAt(0), // Character code
+        keyCode: key.charCodeAt(0), // Key code (deprecated, but still used)
+        bubbles: true, // Allow the event to bubble up
+        cancelable: true // Allow the event to be canceled
+    });
+
+    // Dispatch the event to the desired element
+    const element = document.activeElement; // Get the currently focused element
+    element.dispatchEvent(event);
+}
+
+function randomInteger(limit) {
+    return Math.floor(Math.random() * limit);
+}
+
+function randomChoice(array) {
+    return array[randomInteger(array.length)];
+}
+
+function quoteMeUp() {
+    return randomChoice(Object.keys(quotes))
+}
+
+
+const keybindings = new Map([
+
+    ["1", function() {
+        document.body.style.backgroundColor = "#AAAAAA";
+    }],
+
+    ["2", function() {
+        document.body.style.fontWeight = "bold";
+    }],
+
+    ["3", function() {
+        const el = document.createElement("iframe");
+        el.src = ".";
+        document.body.appendChild(el);
+    }],
+
+    ["4", function() {
+        const inter = setInterval(function() {
+            keybindings.get("3")();
+        }, 1000);
+        intervals.push(inter);
+    }],
+
+    ["5", function() {
+        const inter = setInterval(function() {
+            keybindings.get("4")();
+        }, 1000);
+        intervals.push(inter);
+    }],
+
+    ["6", function() {
+        document.querySelectorAll("iframe").forEach((frame) => {frame.remove()});
+        deleteAllIntervals();
+    }],
+
+    ["7", function() {
+        const input = document.createElement("input");
+        input.addEventListener("input", function() {
+            try {
+                m.innerText += l(eval(input.value)) + "\n";
+            } catch (err) {
+                m.innerText += err + "\n";
+            }
+        });
+        document.body.appendChild(input);
+    }],
+
+    ["8", function() {
+        document.body.style.transition = "transform 2s";
+        document.body.style.transform = "rotate(" + (Math.random() * 720 - 360) + "deg)";
+    }],
+
+    ["9", function() {
+        if (navigator.share) {
+            navigator.share({text: `My favorite number is ${Math.random()}! What's yours?`});
+        
+        // there are two reasons navigator.share could fail
+        // 1. firefox
+        // 2. http
+        } else {
+            alert(
+                navigator.userAgent.includes("Firefox") ?
+                "firefox moment" :
+                "not secure enough. use https or localhost" // this should only ever show if you serve to the network and access the page on a different computer
+            );
+        }
+    }],
+
+    ["0", function() {
+
+        // reverse all the text
+        document.body.innerText = document.body.innerText.split(" ").sort().join(" ") 
+
+        // put the virtual keyboard back
+        document.body.innerHTML += `
+        <button onclick="simulateKeyPress(window.prompt('enter key name'))">virtual keyboard</button>`;
+
+        // put the output div back
+        document.body.innerHTML += `<div id="m"></div>`
+
+        // redefine m
+        m = document.getElementById("m");
+        
+    }],
+
+    ["q", function() {
+
+        const quote = quoteMeUp()
+        alert(`"${quote}"\n\nThis quote was stolen from A-Z Quotes, who stole it from ${quotes[quote]}.`)
+        
+    }],
+
+]);
+
+document.addEventListener("keydown", function(event) {
+    keybindings.get(event.key)();
+})
+
+</script>
