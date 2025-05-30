@@ -1,2 +1,2 @@
 # chaos
-trust nothing
+all PRs get accepted
