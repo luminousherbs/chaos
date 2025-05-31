@@ -23,7 +23,7 @@ let m = document.getElementById("m");
 
 // this could be better if fetch didn't suck
 let quotes;
-fetch("quotes.json").then((res) => {res.json().then((json) => quotes = json)});
+fetch("stuff/quotes.json").then((res) => {res.json().then((json) => quotes = json)});
 
 function deleteAllIntervals() {
     intervals.forEach((inter) => {clearInterval(inter)});
