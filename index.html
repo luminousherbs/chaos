@@ -25,6 +25,12 @@ let m = document.getElementById("m");
 let quotes;
 fetch("stuff/quotes.json").then((res) => {res.json().then((json) => quotes = json)});
 
+// this could also be better if fetch didn't suck
+let zorbees;
+fetch("stuff/zorbees.txt").then((res) => {res.text().then((t) => (zorbees = t.split(" ")))});
+
+let zorbingIndex = 0;
+
 function deleteAllIntervals() {
     intervals.forEach((inter) => {clearInterval(inter)});
 }
@@ -153,6 +159,20 @@ const keybindings = new Map([
         const quote = quoteMeUp()
         alert(`"${quote}"\n\nThis quote was stolen from A-Z Quotes, who stole it from ${quotes[quote]}.`)
         
+    }],
+
+    ["d", function() {
+        // this could be better if fetch didn't suck
+        fetch("../things/day/api.json").then((res) => (res.json().then((day) => alert(`Today is a ${day.data.day}.`))));
+    }],
+
+    ["z", function() {
+
+        const inter = setInterval(function() {
+            m.innerText += " " + zorbees[zorbingIndex];
+            zorbingIndex++;
+        }, 100)
+        intervals.push(inter); 
     }],
 
 ]);
