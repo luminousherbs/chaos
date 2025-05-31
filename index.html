@@ -4,7 +4,9 @@ trust nothing
 
 <button onclick="simulateKeyPress(window.prompt('enter key name'))">virtual keyboard</button>
 
-<div id="m"></div>
+<div id="m">
+    <p id="z"></p>
+</div>
 
 <script>
 
@@ -20,6 +22,7 @@ RULES
 const intervals = [];
 
 let m = document.getElementById("m");
+let z = document.getElementById("z");
 
 // this could be better if fetch didn't suck
 let quotes;
@@ -81,8 +84,9 @@ const keybindings = new Map([
 
     ["3", function() {
         const el = document.createElement("iframe");
-        el.src = ".";
-        document.body.appendChild(el);
+        el.src = "https://en.wikipedia.org/wiki/Special:Random";
+        el.style.height = el.style.width = "50em";
+        m.appendChild(el);
     }],
 
     ["4", function() {
@@ -90,13 +94,20 @@ const keybindings = new Map([
             keybindings.get("3")();
         }, 1000);
         intervals.push(inter);
+
+        // stop if there are too many
+        if (document.querySelectorAll("iframe").length > 25) deleteAllIntervals();
     }],
 
     ["5", function() {
+
         const inter = setInterval(function() {
             keybindings.get("4")();
         }, 1000);
         intervals.push(inter);
+
+        // stop if there are too many
+        if (document.querySelectorAll("iframe").length > 25) deleteAllIntervals();
     }],
 
     ["6", function() {
@@ -140,36 +151,40 @@ const keybindings = new Map([
     ["0", function() {
 
         // reverse all the text
-        document.body.innerText = document.body.innerText.split(" ").sort().join(" ") 
+        document.body.innerText = document.body.innerText.split(/\s+/).sort().join(" ") 
 
         // put the virtual keyboard back
         document.body.innerHTML += `
         <button onclick="simulateKeyPress(window.prompt('enter key name'))">virtual keyboard</button>`;
 
         // put the output div back
-        document.body.innerHTML += `<div id="m"></div>`
+        document.body.innerHTML += `<div id="m"><p id="z"></p></div>`
 
-        // redefine m
+        // redefine m and z
         m = document.getElementById("m");
+        z = document.getElementById("z");
         
     }],
 
     ["q", function() {
-
         const quote = quoteMeUp()
         alert(`"${quote}"\n\nThis quote was stolen from A-Z Quotes, who stole it from ${quotes[quote]}.`)
-        
     }],
+
+     ["s", function() {
+        m.innerHTML += `<img src="/assets/images/shifty${randomInteger(10)}.jpg" width="200em">`
+    }],
+
 
     ["d", function() {
         // this could be better if fetch didn't suck
-        fetch("../things/day/api.json").then((res) => (res.json().then((day) => alert(`Today is a ${day.data.day}.`))));
+        fetch("/things/day/api.json").then((res) => (res.json().then((day) => alert(`Today is a ${day.data.day}.`))));
     }],
 
-    ["z", function() {
 
+    ["z", function() {
         const inter = setInterval(function() {
-            m.innerText += " " + zorbees[zorbingIndex];
+            z.innerText += " " + zorbees[zorbingIndex];
             zorbingIndex++;
         }, 100)
         intervals.push(inter); 
